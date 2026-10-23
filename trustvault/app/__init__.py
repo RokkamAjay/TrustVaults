@@ -107,11 +107,26 @@ def create_app(test_config=None):
     def too_large(_error):
         return jsonify(error="file_too_large", message="Maximum upload size is 10 MB."), 413
 
+
+
     @app.errorhandler(400)
     def bad_request(error):
+        current_app.logger.warning(
+            "Bad request: path=%s method=%s error=%s",
+            request.path,
+            request.method,
+            str(error)
+        )
+
         if request.path.startswith("/api/"):
-            return jsonify(error="bad_request", message="The request could not be processed."), 400
+            return jsonify(
+                error="bad_request",
+                message="The request could not be processed."
+            ), 400
+
         return "Bad request", 400
+
+
 
     def fail_access(action, doc_id, outcome="denied", status=403):
         try:

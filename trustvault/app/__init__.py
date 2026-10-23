@@ -148,7 +148,7 @@ def create_app(test_config=None):
     @app.get("/dashboard")
     @login_required
     def dashboard():
-        return render_template("dashboard.html")
+        return render_template("dashboards.html")
 
     @app.get("/api/me")
     @login_required

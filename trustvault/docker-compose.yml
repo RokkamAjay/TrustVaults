@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: trustvault
+      POSTGRES_USER: trustvault
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your environment}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trustvault -d trustvault"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in your environment}
+      DATABASE_URL: postgresql+psycopg://trustvault:${POSTGRES_PASSWORD}@db:5432/trustvault
+      STORAGE_PATH: /data/private
+      COOKIE_SECURE: ${COOKIE_SECURE:-0}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:?Set DEMO_ADMIN_PASSWORD}
+      DEMO_OWNER_PASSWORD: ${DEMO_OWNER_PASSWORD:?Set DEMO_OWNER_PASSWORD}
+      DEMO_VIEWER_PASSWORD: ${DEMO_VIEWER_PASSWORD:?Set DEMO_VIEWER_PASSWORD}
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - private_docs:/data/private
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  private_docs:

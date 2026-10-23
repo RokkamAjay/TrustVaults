@@ -182,22 +182,27 @@ def create_app(test_config=None):
             str(uuid.uuid4()),
         )[:64]
 
+    
     @app.after_request
     def security_headers(response):
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")
         response.headers.setdefault("Cache-Control", "no-store")
+
         response.headers.setdefault(
             "Content-Security-Policy",
             "default-src 'self'; "
+            "connect-src 'self' https://trustvaults.onrender.com; "
             "style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
             "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
             "img-src 'self' data:; "
             "object-src 'none'; "
             "frame-ancestors 'none'",
         )
+
         return response
+
 
     @app.errorhandler(413)
     def too_large(_error):

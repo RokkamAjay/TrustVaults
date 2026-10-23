@@ -2,6 +2,7 @@ import hashlib
 import os
 import re
 import uuid
+from flask_wtf.csrf import CSRFError
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 from pathlib import Path
@@ -108,6 +109,13 @@ def create_app(test_config=None):
         return jsonify(error="file_too_large", message="Maximum upload size is 10 MB."), 413
 
 
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(error):
+        current_app.logger.warning(
+            "CSRF validation failed: %s",
+            error.description
+        )
+    return "CSRF validation failed. Check server logs.", 400
 
     @app.errorhandler(400)
     def bad_request(error):

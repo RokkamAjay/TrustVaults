@@ -2,8 +2,8 @@ import hashlib
 import os
 import re
 import uuid
-from flask_wtf.csrf import CSRFError
 from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFError
 from datetime import datetime, timezone
 from pathlib import Path
 from flask import Flask, abort, current_app, jsonify, make_response, redirect, render_template, request, send_file, url_for
@@ -18,7 +18,6 @@ from .security import audit_event, can_edit, can_read, require_role
 ALLOWED_EXTENSIONS = {"pdf", "png", "jpg", "jpeg", "txt"}
 MAX_FILE_BYTES = 10 * 1024 * 1024
 
-
 def _is_utf8_text(data):
     try:
         data.decode("utf-8", errors="strict")
@@ -26,11 +25,11 @@ def _is_utf8_text(data):
     except UnicodeDecodeError:
         return False
 
-
 def create_app(test_config=None):
     load_dotenv()
-    instance_dir = os.environ.get("INSTANCE_PATH")
 
+    # Vercel's filesystem is read-only except for /tmp.
+    instance_dir = os.environ.get("INSTANCE_PATH")
     if not instance_dir:
         instance_dir = (
             "/tmp/trustvault_instance"
@@ -41,7 +40,7 @@ def create_app(test_config=None):
     app = Flask(
         __name__,
         instance_relative_config=True,
-        instance_path=instance_dir
+        instance_path=instance_dir,
     )
     app.config.from_mapping(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-change-this-secret"),
@@ -52,7 +51,7 @@ def create_app(test_config=None):
             if os.environ.get("VERCEL")
             else os.environ.get(
                 "STORAGE_PATH",
-                str(Path(app.instance_path) / "private_storage")
+                str(Path(app.instance_path) / "private_storage"),
             )
         ),
         MAX_CONTENT_LENGTH=int(os.environ.get("MAX_CONTENT_LENGTH", MAX_FILE_BYTES)),
@@ -106,16 +105,18 @@ def create_app(test_config=None):
 
     @app.errorhandler(413)
     def too_large(_error):
-        return jsonify(error="file_too_large", message="Maximum upload size is 10 MB."), 413
-
+        return jsonify(
+            error="file_too_large",
+            message="Maximum upload size is 10 MB.",
+        ), 413
 
     @app.errorhandler(CSRFError)
     def handle_csrf_error(error):
         current_app.logger.warning(
             "CSRF validation failed: %s",
-            error.description
+            error.description,
         )
-    return "CSRF validation failed. Check server logs.", 400
+        return "CSRF validation failed. Check server logs.", 400
 
     @app.errorhandler(400)
     def bad_request(error):
@@ -123,18 +124,14 @@ def create_app(test_config=None):
             "Bad request: path=%s method=%s error=%s",
             request.path,
             request.method,
-            str(error)
+            str(error),
         )
-
         if request.path.startswith("/api/"):
             return jsonify(
                 error="bad_request",
-                message="The request could not be processed."
+                message="The request could not be processed.",
             ), 400
-
         return "Bad request", 400
-
-
 
     def fail_access(action, doc_id, outcome="denied", status=403):
         try:
@@ -450,4 +447,6 @@ def create_app(test_config=None):
 
     with app.app_context():
         db.create_all()
+
     return app
+

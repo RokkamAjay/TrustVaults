@@ -61,9 +61,13 @@ def create_app(test_config=None):
         WTF_CSRF_TIME_LIMIT=None,
     )
     if test_config:
-        app.config.update(test_config,WTF_CSRF_SSL_STRICT=False)
+        app.config.update(test_config)
+
+    app.config["WTF_CSRF_SSL_STRICT"] = False
+
     os.makedirs(app.instance_path, exist_ok=True)
     os.makedirs(app.config["STORAGE_PATH"], exist_ok=True)
+
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "login"

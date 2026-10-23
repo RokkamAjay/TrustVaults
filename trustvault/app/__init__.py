@@ -128,10 +128,18 @@ def create_app(test_config=None):
     os.makedirs(app.instance_path, exist_ok=True)
     os.makedirs(app.config["STORAGE_PATH"], exist_ok=True)
 
+    
+    # Configure SQLAlchemy database connection pooling
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
+
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "login"
     csrf.init_app(app)
+
 
     @login_manager.unauthorized_handler
     def unauthorized():

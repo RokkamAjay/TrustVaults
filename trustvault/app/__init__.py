@@ -1,4 +1,4 @@
-
+from flask_cors import CORS
 import hashlib
 import os
 import re
@@ -69,6 +69,17 @@ def create_app(test_config=None):
         __name__,
         instance_relative_config=True,
         instance_path=instance_dir,
+    )
+    app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE="None"
+    )
+    CORS(
+    app,
+    resources={r"/api/*": {"origins": ["https://trust-vaults-project.vercel.app"]}},
+    supports_credentials=True,
+    allow_headers=["Content-Type", "X-CSRFToken"],
+    methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
     )
 
     # Database configuration

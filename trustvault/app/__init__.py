@@ -28,7 +28,20 @@ def _is_utf8_text(data):
 
 def create_app(test_config=None):
     load_dotenv()
-    app = Flask(__name__, instance_relative_config=True)
+    instance_dir = os.environ.get("INSTANCE_PATH")
+
+    if not instance_dir:
+        instance_dir = (
+            "/tmp/trustvault_instance"
+            if os.environ.get("VERCEL")
+            else str(Path(__file__).resolve().parent.parent / "instance")
+        )
+
+    app = Flask(
+        __name__,
+        instance_relative_config=True,
+        instance_path=instance_dir
+    )
     app.config.from_mapping(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-change-this-secret"),
         SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///trustvault.db"),

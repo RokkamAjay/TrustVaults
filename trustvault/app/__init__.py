@@ -112,10 +112,8 @@ def create_app(test_config=None):
             os.environ.get("MAX_CONTENT_LENGTH", MAX_FILE_BYTES)
         ),
         SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SAMESITE="Lax",
-        SESSION_COOKIE_SECURE=(
-            os.environ.get("COOKIE_SECURE", "0") == "1"
-        ),
+        SESSION_COOKIE_SAMESITE="None",
+        SESSION_COOKIE_SECURE=True,
         WTF_CSRF_TIME_LIMIT=None,
     )
 

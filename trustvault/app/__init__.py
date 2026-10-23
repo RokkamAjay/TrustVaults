@@ -46,7 +46,14 @@ def create_app(test_config=None):
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-change-this-secret"),
         SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///trustvault.db"),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        STORAGE_PATH=os.environ.get("STORAGE_PATH", str(Path(app.instance_path) / "private_storage")),
+        STORAGE_PATH=(
+            str(Path("/tmp/trustvault_storage"))
+            if os.environ.get("VERCEL")
+            else os.environ.get(
+                "STORAGE_PATH",
+                str(Path(app.instance_path) / "private_storage")
+            )
+        ),
         MAX_CONTENT_LENGTH=int(os.environ.get("MAX_CONTENT_LENGTH", MAX_FILE_BYTES)),
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",

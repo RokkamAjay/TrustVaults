@@ -47,7 +47,8 @@
     const response = await fetch(apiUrl, {
       ...options,
       headers,
-      credentials: "include"
+      credentials: "include",
+      redirect: "manual"
     });
 
     if (response.status === 401) {

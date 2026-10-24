@@ -191,7 +191,7 @@ def create_app(test_config=None):
         response.headers.setdefault(
             "Content-Security-Policy",
             "default-src 'self'; "
-            "connect-src 'self' https://trustvaults.onrender.com; "
+            "connect-src 'self' https://trustvaults.onrender.com https://cdn.jsdelivr.net; "
             "style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
             "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
             "img-src 'self' data:; "
